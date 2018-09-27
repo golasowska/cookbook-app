@@ -1,6 +1,7 @@
 import Search from './models/Search';
 import Recipe from './models/Recipe';
 import List from './models/List';
+import Likes from './models/Likes';
 import * as searchView from './views/searchView';
 import * as recipeView from './views/recipeView';
 import * as listView from './views/listView';
@@ -16,7 +17,7 @@ import { elements, renderLoader, clearLoader } from './views/base';
 
 const state = {};
 
-// SEARCH CONTROLER //
+// SEARCH CONTROLLER //
 
 const controlSearch = async () => {
   const query = searchView.getInput();
@@ -55,7 +56,7 @@ elements.searchResPages.addEventListener('click', e => {
   }
 });
 
-// RECIPE CONTROLER //
+// RECIPE CONTROLLER //
 
 const controlRecipe = async () => {
   const id = window.location.hash.replace('#', '');
@@ -89,7 +90,7 @@ const controlRecipe = async () => {
   window.addEventListener(event, controlRecipe)
 );
 
-// LIST CONTROLER //
+// LIST CONTROLLER //
 
 const controlList = () => {
   if (!state.list) state.list = new List();
@@ -112,6 +113,26 @@ elements.shopping.addEventListener('click', e => {
   }
 });
 
+// LIKE CONTROLER //
+
+const controlLike = () => {
+  if (!state.likes) state.likes = new Likes();
+  const currentID = state.recipe.id;
+
+  if (!state.likes.isLiked(currentID)) {
+    const newLike = state.likes.addLike(
+      currentID,
+      state.recipe.title,
+      state.recipe.author,
+      state.recipe.img
+    );
+    console.log(state.likes);
+  } else {
+    state.likes.deleteLike(currentID);
+    console.log(state.likes);
+  }
+};
+
 elements.recipe.addEventListener('click', e => {
   if (e.target.matches('.btn-decrease, .btn-decrease *')) {
     if (state.recipe.servings > 1) {
@@ -123,8 +144,9 @@ elements.recipe.addEventListener('click', e => {
     recipeView.updateServingsIngredients(state.recipe);
   } else if (e.target.matches('.recipe__btn--add, .recipe__btn--add *')) {
     controlList();
+  } else if (e.target.matches('.recipe__love, .recipe__love *')) {
+    controlLike();
   }
-  console.log(state.recipe);
 });
 
 window.l = new List();
