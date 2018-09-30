@@ -5,6 +5,7 @@ import Likes from './models/Likes';
 import * as searchView from './views/searchView';
 import * as recipeView from './views/recipeView';
 import * as listView from './views/listView';
+import * as likesView from './views/likesView';
 import { elements, renderLoader, clearLoader } from './views/base';
 /*  global state of the app
 
@@ -60,7 +61,7 @@ elements.searchResPages.addEventListener('click', e => {
 
 const controlRecipe = async () => {
   const id = window.location.hash.replace('#', '');
-  console.log(id);
+  // console.log(id);
   if (id) {
     recipeView.clearRecipe();
     renderLoader(elements.recipe);
@@ -76,7 +77,7 @@ const controlRecipe = async () => {
       state.recipe.calcTime();
       state.recipe.calcServings();
       clearLoader();
-      recipeView.renderRecipe(state.recipe);
+      recipeView.renderRecipe(state.recipe, state.likes.isLiked(id));
     } catch (error) {
       alert(error);
     }
@@ -126,12 +127,26 @@ const controlLike = () => {
       state.recipe.author,
       state.recipe.img
     );
-    console.log(state.likes);
+    likesView.toggleLikeBtn(true);
+    likesView.renderLike(newLike);
+    // console.log(state.likes);
   } else {
     state.likes.deleteLike(currentID);
-    console.log(state.likes);
+    likesView.toggleLikeBtn(false);
+    // console.log(state.likes);
+    likesView.deleteLike(currentID);
   }
+  likesView.toggleLikeMenu(state.likes.getNumLikes());
 };
+
+window.addEventListener('load', () => {
+  state.likes = new Likes();
+  state.likes.readStorage();
+  likesView.toggleLikeMenu(state.likes.getNumLikes());
+  state.likes.likes.forEach(like => {
+    likesView.renderLike(like);
+  });
+});
 
 elements.recipe.addEventListener('click', e => {
   if (e.target.matches('.btn-decrease, .btn-decrease *')) {
@@ -148,5 +163,3 @@ elements.recipe.addEventListener('click', e => {
     controlLike();
   }
 });
-
-window.l = new List();
